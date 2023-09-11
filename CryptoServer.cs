@@ -74,6 +74,7 @@ namespace Server
                     int size = (int)binaryReader.ReadInt64();
                     int padding = binaryReader.ReadInt32();
 
+                    File.Delete("encrypted");
                     File.Delete(name);
                     FileStream f_in = new FileStream(name, FileMode.Create);
 
@@ -84,6 +85,8 @@ namespace Server
                     }
                     f_in.Close();
                     
+                    decryptor.Decrypt("encrypted", name, sessionKey, padding);
+                    File.Delete("encrypted");
                     binaryWriter.Write("OK");
 
                     Console.WriteLine($"File {name} downloaded to server");
@@ -116,7 +119,7 @@ namespace Server
 
                     FileInfo fileInfo = new FileInfo(fileName);
                     if (fileInfo.Exists)
-                    {   
+                    {
                         var size = fileInfo.Length;
 
                         binaryWriter.Write("file");
@@ -131,6 +134,7 @@ namespace Server
                             binaryWriter.Write(bytes);
                         }
                         f_in.Close();
+                        File.Delete("encrypted");
 
                         if (!(binaryReader.ReadString() != "OK"))
                         {
